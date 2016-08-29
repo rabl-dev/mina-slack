@@ -14,9 +14,17 @@ namespace :slack do
 
   task :starting do
     if slack_url and slack_room
-      announcement = "#{announced_deployer} is deploying #{announced_application_name} to #{announced_stage}"
+      message = message(
+          verb: 'is deploying',
+          github_url: github_url,
+          commit_hash: deployed_revision,
+          app: app,
+          deployer: deployer,
+          environment: environment,
+          branch: branch
+      )
 
-      post_slack_message(announcement)
+      post_slack_message(message)
       set(:start_time, Time.now)
     else
       print_local_status "Unable to create Slack Announcement, no slack details provided."
@@ -29,9 +37,19 @@ namespace :slack do
       start_time = fetch(:start_time)
       elapsed = end_time.to_i - start_time.to_i
 
-      announcement = "#{announced_deployer} successfully deployed #{announced_application_name} in #{elapsed} seconds."
+      message = message(
+          verb: 'is deploying',
+          github_url: github_url,
+          commit_hash: deployed_revision,
+          app: app,
+          deployer: deployer,
+          environment: environment,
+          branch: branch
+      )
 
-      post_slack_message(announcement)
+      message += " in #{elapsed} seconds."
+
+      post_slack_message(message)
     else
       print_local_status "Unable to create Slack Announcement, no slack details provided."
     end
@@ -56,6 +74,14 @@ namespace :slack do
       output << " `#{branch}`" if branch
       output << " (`#{short_revision}`)" if short_revision
     end
+  end
+
+  def message(options)
+    commit_link = "<#{options[:github_url]}/commit/" \
+        "#{options[:commit_hash]}|#{options[:branch]}@#{short_revision}>"
+
+    "#{options[:deployer]} #{options[:verb]} #{options[:app]}'s" \
+        " #{commit_link} to #{options[:environment]}"
   end
 
   def post_slack_message(message)
