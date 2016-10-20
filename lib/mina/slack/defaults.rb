@@ -1,5 +1,5 @@
 # Required
-set_default :slack_url,       -> { ENV['SLACK_URL'] }
+set_default :slack_url,         -> { ENV['SLACK_URL'] }
 set_default :slack_room,        -> { ENV['SLACK_ROOM'] }
 # Optional
 set_default :slack_stage,       -> { ENV['SLACK_STAGE'] || ENV['to'] || fetch(:rails_env, 'production') }

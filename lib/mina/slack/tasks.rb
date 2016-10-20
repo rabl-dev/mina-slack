@@ -1,19 +1,13 @@
-require 'mina/hooks'
-
 require 'json'
 require 'net/http'
 
 
-# Before and after hooks for mina deploy
-before_mina :deploy, :'slack:starting'
-after_mina :deploy, :'slack:finished'
-
-
 # Slack tasks
 namespace :slack do
-
+  desc 'Announcing deployment to Slack'
   task :starting do
-    if slack_url and slack_room
+    puts 'Starting Slack announcement'
+    if slack_url && slack_room
       announcement = "#{announced_deployer} is deploying #{announced_application_name} to #{announced_stage}"
 
       post_slack_message(announcement)
@@ -23,8 +17,10 @@ namespace :slack do
     end
   end
 
+  desc 'Announcing finished deployment to Slack'
   task :finished do
-    if slack_url and slack_room
+    puts 'Finished Slack announcement'
+    if slack_url && slack_room
       end_time = Time.now
       start_time = fetch(:start_time)
       elapsed = end_time.to_i - start_time.to_i
@@ -36,7 +32,6 @@ namespace :slack do
       print_local_status "Unable to create Slack Announcement, no slack details provided."
     end
   end
-
 
   def announced_stage
     slack_stage
