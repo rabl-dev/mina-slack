@@ -2,6 +2,7 @@ require 'mina/hooks'
 
 require 'json'
 require 'net/http'
+require 'openssl'
 
 
 # Before and after hooks for mina deploy
